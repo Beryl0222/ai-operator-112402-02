@@ -1,17 +1,17 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import {readFileSync} from 'node:fs';
 import test from 'node:test';
+import { int4Activation, int4Column } from '../inputs/int4-wire.mjs';
 
-const d = JSON.parse(readFileSync(new URL('../inputs/session.json', import.meta.url), 'utf8'));
-
-test("查询及键值维数", () => {
-  assert.ok(d.keys.every(x=>x.k.length===2 && x.v.length===2) && d.queries.every(q=>q.q.length===2));
-});
-
-test("补片与旧键的身份重叠", () => {
-  assert.ok(d.keys[0].column===d.keys[3].column && d.keys[0].word===d.keys[3].word && d.keys[3].rev>d.keys[0].rev);
-});
-
-test("撤下发生在可查修订", () => {
-  assert.ok(d.events.some(x=>x[0]==='withdraw' && x[3]===d.queries[2].rev));
+const data=JSON.parse(readFileSync(new URL('../inputs/int4-wire.json',import.meta.url),'utf8'));
+test('矩阵片段和码字的格式与关联', () => {
+  const a = int4Activation(0,0);
+  const packed = int4Column(0);
+  assert.equal(a.length,data.shape[1]);
+  assert.equal(packed.length,Math.ceil(data.shape[1]/2));
+  assert.equal(packed.at(-1) >>> 4,0);
+  assert.equal(data.groupCuts.at(-1),data.shape[1]);
+  assert.ok((a[0]-data.recipe.zeroA)*8*1024 > 32767);
+  assert.ok(data.bytes < data.shape[1]*data.shape[2]/2);
+  assert.notEqual(data.small.wHex,data.small.wHexInvalidTail);
 });
