@@ -9,3 +9,7 @@
 ## 资料读取
 
 样本位于 `inputs/session.json`，其中 `events` 是按到达顺序记下的操作，编号从零开始。keys 选记录的半开下标范围；withdraw 给出票据、栏和撤回生效修订。query、confirm、retry 以查询 ID 引用。
+
+## 设备联调资料
+
+`inputs/qualification.json` 描述页规模和操作。`page` 以 `row>=0` 生成页内每行，列继承 `page % columns`，同一物理页的后半段归入下一列。每行权威身份是 `[页号,行号]`，同一列有多个物理页。键与值分别是二维 `[row,width]`，按 K 头编号请求。`query` 指定页访问中的逻辑列列表、键值头映射、`bias` 作为按相对页位置取余的加分项。初次生成至多读取每个头的每页一次。`retract` 撤回指定列的 revision 1，`replace` 从供应方单独提供该页的 revision 2 的指定行段，其他可见行仍按其原修订。`release` 指定哪些物理页在初次供给后不得重读。`maxWorkBytes` 计内部留存以及同时准备的所有查询工作区，不计调用方的查询输入和已确认的结果。
